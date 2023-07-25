@@ -20,9 +20,15 @@
       <div class="large-logo">
         <img alt="Carpentries Incubator" src="assets/images/incubator-logo.svg"><abbr class="icon" title="This lesson is in the pre-alpha phase, which means that it is in early development, but has not yet been taught." style="text-decoration: unset">
            
-          <a href="https://cdh.carpentries.org/the-lesson-life-cycle.html#early-development-pre-alpha-through-alpha" class="external-link alert-link" style="color: #383838">Pre-Alpha
+<!--
+          <a href="https://cdh.carpentries.org/the-lesson-life-cycle.html#early-development-pre-alpha-through-alpha" class="alert-link" style="color: #383838">Pre-Alpha
             <i aria-hidden="true" class="icon" data-feather="alert-octagon" style="color: #FF4955; border-radius: 5px"></i>
           </a>
+-->
+          <a href="https://bioconductor.github.io/2023-07-31-BiocRnaseq-Bioc2023/" class="external-link alert-link" style="color: #383838">Under active development for BioC2023 workshop July 31 - August 1 2023
+            <i aria-hidden="true" class="icon" data-feather="alert-octagon" style="color: #FF4955; border-radius: 5px"></i>
+          </a>
+
           <span class="visually-hidden">This lesson is in the pre-alpha phase, which means that it is in early development, but has not yet been taught.</span>
         </abbr>
         
@@ -268,7 +274,16 @@
       <hr></nav><main id="main-content" class="main-content"><h1 class="schedule-heading">Summary and Setup</h1>
       
 
-<p>RNA sequencing (RNA-seq) has revolutionized the field of genomics, enabling researchers to gain insights into gene expression, transcriptome dynamics, and molecular pathways. <a href="https://bioconductor.org/" class="external-link">Bioconductor</a> is an open-source software project that provides a rich set of tools for analyzing high-throughput genomic data, including RNA-seq data. This <a href="https://carpentries.org/" class="external-link">Carpentries</a>-style workshop is designed to equip participants with the essential skills and knowledge needed to analyze RNA-seq data using the Bioconductor ecosystem. Throughout this workshop, you will delve into key concepts, including data preprocessing, quality control, differential gene expression analysis, visualization of results, and gene set analysis.</p>
+<p>RNA sequencing (RNA-seq) has revolutionized the field of genomics,
+enabling researchers to gain insights into gene expression,
+transcriptome dynamics, and molecular pathways. <a href="https://bioconductor.org/" class="external-link">Bioconductor</a> is an open-source
+software project that provides a rich set of tools for analyzing
+high-throughput genomic data, including RNA-seq data. This <a href="https://carpentries.org/" class="external-link">Carpentries</a>-style workshop is
+designed to equip participants with the essential skills and knowledge
+needed to analyze RNA-seq data using the Bioconductor ecosystem.
+Throughout this workshop, you will delve into key concepts, including
+data preprocessing, quality control, differential gene expression
+analysis, visualization of results, and gene set analysis.</p>
 <!-- this is an html comment -->
 <div id="prerequisites" class="callout prereq">
 <div class="callout-square">
@@ -278,28 +293,42 @@
 <h3 class="callout-title">Prerequisites<a class="anchor" aria-label="anchor" href="#prerequisites"></a>
 </h3>
 <div class="callout-content">
-<ul><li>Familiarity with R/Bioconductor, especially the <a href="https://carpentries-incubator.github.io/bioc-intro/23-starting-with-r.html" class="external-link">Introduction to R</a> episode of <a href="https://carpentries-incubator.github.io/bioc-intro/20-r-rstudio.html" class="external-link">Introduction to data analysis with R and Bioconductor</a> lesson.</li>
-<li>Familiarity with statistical hypothesis testing, such as <a href="https://web.stanford.edu/class/bios221/book/06-chap.html" class="external-link">Chapter 6</a> of Modern Statistics for Modern Biology book by Holmes and Huber.</li>
-<li>Familiarity with the biology of gene expression and RNA-seq, such as <a href="https://pubmed.gov/31341269" class="external-link">RNA sequencing: the teenage years</a> manuscript by Hadfield et.al.</li>
+<ul><li>Familiarity with R/Bioconductor, such as the <a href="https://carpentries-incubator.github.io/bioc-intro/" class="external-link">Introduction
+to data analysis with R and Bioconductor</a> lesson.</li>
+<li>Familiarity with statistical hypothesis testing, such as <a href="https://web.stanford.edu/class/bios221/book/06-chap.html" class="external-link">Chapter
+6</a> of Modern Statistics for Modern Biology book by Holmes and
+Huber.</li>
+<li>Familiarity with the biology of gene expression and RNA-seq, such as
+<a href="https://pubmed.gov/31341269" class="external-link">RNA sequencing: the teenage
+years</a> manuscript by Hadfield et.al.</li>
 </ul></div>
 </div>
 </div>
 
 
-      <section id="setup"><p>Ensure that you have the most recent versions of R and RStudio installed on your computer. For detailed instructions on how to do this, you can refer to the section “If you already have R and RStudio installed” in the <a href="https://carpentries-incubator.github.io/bioc-intro/#r-and-rstudio" class="external-link">Introduction to R</a> episode of the <a href="https://carpentries-incubator.github.io/bioc-intro" class="external-link">Introduction to data analysis with R and Bioconductor</a> lesson.</p>
-<p>Additionally, you will also need to install the following packages that will be used throughout the lesson.</p>
+      <section id="setup"><p>Ensure that you have the most recent versions of R and RStudio
+installed on your computer. For detailed instructions on how to do this,
+you can refer to the section “If you already have R and RStudio
+installed” in the <a href="https://carpentries-incubator.github.io/bioc-intro/#r-and-rstudio" class="external-link">Introduction
+to R</a> episode of the <a href="https://carpentries-incubator.github.io/bioc-intro" class="external-link">Introduction
+to data analysis with R and Bioconductor</a> lesson.</p>
+<p>Additionally, you will also need to install the following packages
+that will be used throughout the lesson.</p>
 <div class="codewrapper sourceCode" id="cb1">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">install.packages</span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span></span>
 <span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu">install</span><span class="op">(</span><span class="fu">c</span><span class="op">(</span><span class="st">"tidyverse"</span>, <span class="st">"SummarizedExperiment"</span>,</span>
-<span>                       <span class="st">"ExploreModelMatrix"</span>, <span class="st">"org.Mm.eg.db"</span>,</span>
+<span>                       <span class="st">"ExploreModelMatrix"</span>, <span class="st">"org.Hs.eg.db"</span>, <span class="st">"org.Mm.eg.db"</span>,</span>
 <span>                       <span class="st">"DESeq2"</span>, <span class="st">"vsn"</span>, <span class="st">"ComplexHeatmap"</span>,</span>
 <span>                       <span class="st">"RColorBrewer"</span>, <span class="st">"hexbin"</span>, <span class="st">"cowplot"</span>,</span>
-<span>                       <span class="st">"clusterProfiler"</span>, <span class="st">"enrichplot"</span>, <span class="st">"kableExtra"</span><span class="op">)</span><span class="op">)</span></span></code></pre>
+<span>                       <span class="st">"clusterProfiler"</span>, <span class="st">"enrichplot"</span>, <span class="st">"kableExtra"</span>,</span>
+<span>                       <span class="st">"msigdbr"</span>, <span class="st">"gplots"</span>, <span class="st">"ggplot2"</span>, <span class="st">"simplifyEnrichment"</span>,<span class="st">"apeglm"</span><span class="op">)</span><span class="op">)</span></span></code></pre>
 </div>
-<p><em>If you are attending a workshop, please complete all of the above before the workshop. Should you need help, an instructor will be available 30 minutes before the workshop commences to assist.</em></p>
+<p><em>If you are attending a workshop, please complete all of the above
+before the workshop. Should you need help, an instructor will be
+available 30 minutes before the workshop commences to assist.</em></p>
 
 
       </section></main><nav class="bottom-pagination mx-md-4" aria-label="Next Chapter"><!-- content for small screens --><div class="d-block d-sm-block d-md-none">
@@ -329,9 +358,9 @@
         <p>Materials licensed under <a href="LICENSE.html">CC-BY 4.0</a> by the authors</p>
         
         <p><a href="https://creativecommons.org/licenses/by-sa/4.0/" class="external-link">Template licensed under CC-BY 4.0</a> by <a href="https://carpentries.org" class="external-link">The Carpentries</a></p>
-        <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/0.12.4" class="external-link">sandpaper (0.12.4)</a>,
-        <a href="https://github.com/carpentries/pegboard/tree/0.5.2" class="external-link">pegboard (0.5.2)</a>,
-      and <a href="https://github.com/carpentries/varnish/tree/0.2.14" class="external-link">varnish (0.2.14)</a>.</p>
+        <p>Built with <a href="https://github.com/carpentries/sandpaper" class="external-link">sandpaper (0.12.5)</a>,
+        <a href="https://github.com/carpentries/pegboard" class="external-link">pegboard (0.5.3)</a>,
+      and <a href="https://github.com/mblue9/varnish/tree/3403ad0dd37f7641c6442330fcc182937e7964c5" class="external-link">varnish (0.2.16)</a>.</p>
 			</div>
 		</footer></div> <!-- / div.container -->
 	<div id="to-top">
@@ -352,8 +381,8 @@
   "url": "https://carpentries-incubator.github.io/bioc-rnaseq/index.html",
   "identifier": "https://carpentries-incubator.github.io/bioc-rnaseq/index.html",
   "dateCreated": "2020-09-15",
-  "dateModified": "2023-07-19",
-  "datePublished": "2023-07-19"
+  "dateModified": "2023-07-25",
+  "datePublished": "2023-07-25"
 }
 
   </script><script>

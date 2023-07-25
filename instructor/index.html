@@ -20,9 +20,15 @@
       <div class="large-logo">
         <img alt="Carpentries Incubator" src="../assets/images/incubator-logo.svg"><abbr class="icon" title="This lesson is in the pre-alpha phase, which means that it is in early development, but has not yet been taught." style="text-decoration: unset">
            
-          <a href="https://cdh.carpentries.org/the-lesson-life-cycle.html#early-development-pre-alpha-through-alpha" class="external-link alert-link" style="color: #383838">Pre-Alpha
+<!--
+          <a href="https://cdh.carpentries.org/the-lesson-life-cycle.html#early-development-pre-alpha-through-alpha" class="alert-link" style="color: #383838">Pre-Alpha
             <i aria-hidden="true" class="icon" data-feather="alert-octagon" style="color: #FF4955; border-radius: 5px"></i>
           </a>
+-->
+          <a href="https://bioconductor.github.io/2023-07-31-BiocRnaseq-Bioc2023/" class="external-link alert-link" style="color: #383838">Under active development for BioC2023 workshop July 31 - August 1 2023
+            <i aria-hidden="true" class="icon" data-feather="alert-octagon" style="color: #FF4955; border-radius: 5px"></i>
+          </a>
+
           <span class="visually-hidden">This lesson is in the pre-alpha phase, which means that it is in early development, but has not yet been taught.</span>
         </abbr>
         
@@ -267,7 +273,16 @@
       <hr></nav><main id="main-content" class="main-content"><h1 class="schedule-heading">Summary and Schedule</h1>
       
 
-<p>RNA sequencing (RNA-seq) has revolutionized the field of genomics, enabling researchers to gain insights into gene expression, transcriptome dynamics, and molecular pathways. <a href="https://bioconductor.org/" class="external-link">Bioconductor</a> is an open-source software project that provides a rich set of tools for analyzing high-throughput genomic data, including RNA-seq data. This <a href="https://carpentries.org/" class="external-link">Carpentries</a>-style workshop is designed to equip participants with the essential skills and knowledge needed to analyze RNA-seq data using the Bioconductor ecosystem. Throughout this workshop, you will delve into key concepts, including data preprocessing, quality control, differential gene expression analysis, visualization of results, and gene set analysis.</p>
+<p>RNA sequencing (RNA-seq) has revolutionized the field of genomics,
+enabling researchers to gain insights into gene expression,
+transcriptome dynamics, and molecular pathways. <a href="https://bioconductor.org/" class="external-link">Bioconductor</a> is an open-source
+software project that provides a rich set of tools for analyzing
+high-throughput genomic data, including RNA-seq data. This <a href="https://carpentries.org/" class="external-link">Carpentries</a>-style workshop is
+designed to equip participants with the essential skills and knowledge
+needed to analyze RNA-seq data using the Bioconductor ecosystem.
+Throughout this workshop, you will delve into key concepts, including
+data preprocessing, quality control, differential gene expression
+analysis, visualization of results, and gene set analysis.</p>
 <!-- this is an html comment -->
 <div id="prerequisites" class="callout prereq">
 <div class="callout-square">
@@ -277,9 +292,14 @@
 <h3 class="callout-title">Prerequisites<a class="anchor" aria-label="anchor" href="#prerequisites"></a>
 </h3>
 <div class="callout-content">
-<ul><li>Familiarity with R/Bioconductor, especially the <a href="https://carpentries-incubator.github.io/bioc-intro/23-starting-with-r.html" class="external-link">Introduction to R</a> episode of <a href="https://carpentries-incubator.github.io/bioc-intro/20-r-rstudio.html" class="external-link">Introduction to data analysis with R and Bioconductor</a> lesson.</li>
-<li>Familiarity with statistical hypothesis testing, such as <a href="https://web.stanford.edu/class/bios221/book/06-chap.html" class="external-link">Chapter 6</a> of Modern Statistics for Modern Biology book by Holmes and Huber.</li>
-<li>Familiarity with the biology of gene expression and RNA-seq, such as <a href="https://pubmed.gov/31341269" class="external-link">RNA sequencing: the teenage years</a> manuscript by Hadfield et.al.</li>
+<ul><li>Familiarity with R/Bioconductor, such as the <a href="https://carpentries-incubator.github.io/bioc-intro/" class="external-link">Introduction
+to data analysis with R and Bioconductor</a> lesson.</li>
+<li>Familiarity with statistical hypothesis testing, such as <a href="https://web.stanford.edu/class/bios221/book/06-chap.html" class="external-link">Chapter
+6</a> of Modern Statistics for Modern Biology book by Holmes and
+Huber.</li>
+<li>Familiarity with the biology of gene expression and RNA-seq, such as
+<a href="https://pubmed.gov/31341269" class="external-link">RNA sequencing: the teenage
+years</a> manuscript by Hadfield et.al.</li>
 </ul></div>
 </div>
 </div>
@@ -293,7 +313,12 @@
  1. <a href="01-intro-to-rnaseq.html">Introduction to RNA-seq</a>
 </td>
 <td>
-What are the different choices to consider when planning an RNA-seq experiment?<br>How does one process the raw fastq files to generate a table with read counts per gene and sample?<br>Where does one find information about annotated genes for a given organism?<br>Which are the most commonly used Bioconductor packages for statistical analysis of RNA-seq data?<br>What are the typical steps in an RNA-seq analysis?
+What are the different choices to consider when planning an RNA-seq
+experiment?<br>How does one process the raw fastq files to generate a
+table with read counts per gene and sample?<br>Where does one find
+information about annotated genes for a given organism?<br>Which are
+the most commonly used Bioconductor packages for statistical analysis of
+RNA-seq data?<br>What are the typical steps in an RNA-seq analysis?
 </td>
 </tr><tr><td>
 <span class="visually-hidden">Duration: </span>00h 10m
@@ -302,34 +327,47 @@ What are the different choices to consider when planning an RNA-seq experiment?<
  2. <a href="02-setup.html">RStudio Project and Experimental Data</a>
 </td>
 <td>
-How do you use RStudio project to manage your analysis project?<br>What is the most effective way for organising directories for an analysis project?<br>How to download a dataset from the internet and save as a file.
+How do you use RStudio project to manage your analysis project?<br>What
+is the most effective way for organising directories for an analysis
+project?<br>How to download a dataset from the internet and save as a
+file.
 </td>
 </tr><tr><td>
 <span class="visually-hidden">Duration: </span>00h 20m
 </td>
 <td>
- 3. <a href="03-import-annotate.html">Importing and annotating quantified data into R</a>
+ 3. <a href="03-import-annotate.html">Importing and annotating
+quantified data into R</a>
 </td>
 <td>
-How can one import quantified gene expression data into an object suitable for downstream statistical analysis in R?<br>What types of gene identifiers are typically used, and how are mappings between them done?
+How can one import quantified gene expression data into an object
+suitable for downstream statistical analysis in R?<br>What types of
+gene identifiers are typically used, and how are mappings between them
+done?<br>::::::::::::::::::::::::::::::::::::::::::::::::::
 </td>
 </tr><tr><td>
 <span class="visually-hidden">Duration: </span>00h 30m
 </td>
 <td>
- 4. <a href="04-exploratory-qc.html">Exploratory analysis and quality control</a>
+ 4. <a href="04-exploratory-qc.html">Exploratory analysis and quality
+control</a>
 </td>
 <td>
-Why is exploratory analysis an essential part of an RNA-seq analysis?<br>How should one preprocess the raw count matrix for exploratory analysis?<br>Are two dimensions sufficient to represent your data?
+Why is exploratory analysis an essential part of an RNA-seq
+analysis?<br>How should one preprocess the raw count matrix for
+exploratory analysis?<br>Are two dimensions sufficient to represent
+your data?
 </td>
 </tr><tr><td>
 <span class="visually-hidden">Duration: </span>00h 40m
 </td>
 <td>
- 5. <a href="05-differential-expression.html">Differential expression analysis</a>
+ 5. <a href="05-differential-expression.html">Differential expression
+analysis</a>
 </td>
 <td>
-What are the steps performed in a typical differential expression analysis?<br>How does one interpret the output of DESeq2?
+What are the steps performed in a typical differential expression
+analysis?<br>How does one interpret the output of DESeq2?
 </td>
 </tr><tr><td>
 <span class="visually-hidden">Duration: </span>00h 50m
@@ -338,7 +376,9 @@ What are the steps performed in a typical differential expression analysis?<br>H
  6. <a href="06-gene-set-analysis.html">Gene set enrichment analysis</a>
 </td>
 <td>
-What is the aim of performing gene set enrichment analysis?<br>What is the method of over-representation analysis?<br>What are the commonly-used gene set databases?
+What is the aim of performing gene set enrichment analysis?<br>What is
+the method of over-representation analysis?<br>What are the
+commonly-used gene set databases?
 </td>
 </tr><tr><td>
 <span class="visually-hidden">Duration: </span>01h 00m
@@ -347,19 +387,22 @@ What is the aim of performing gene set enrichment analysis?<br>What is the metho
  7. <a href="07-next-steps.html">Next steps</a>
 </td>
 <td>
-How to go further from here?<br>What other types of analyses can be done with RNA-seq data?
-</td>
-</tr><tr><td>
-<span class="visually-hidden">Duration: </span>01h 10m
-</td>
-<td>
- 8. <a href="08-extra-design.html">Extra exploration of design matrices</a>
-</td>
-<td>
-How can one translate biological questions and comparisons to statistical terms suitable for use with RNA-seq analysis packages?
+How to go further from here?<br>What other types of analyses can be
+done with RNA-seq data?
 </td>
 </tr><tr><td>
 <span class="visually-hidden">Duration: </span>01h 20m
+</td>
+<td>
+ 8. <a href="08-extra-design.html">Extra exploration of design
+matrices</a>
+</td>
+<td>
+How can one translate biological questions and comparisons to
+statistical terms suitable for use with RNA-seq analysis packages?
+</td>
+</tr><tr><td>
+<span class="visually-hidden">Duration: </span>02h 20m
 </td>
 <td>
 Finish
@@ -369,20 +412,29 @@ Finish
 </tr></tbody></table><p>
       The actual schedule may vary slightly depending on the topics and exercises chosen by the instructor.
       </p>
-      </section><section id="setup"><p>Ensure that you have the most recent versions of R and RStudio installed on your computer. For detailed instructions on how to do this, you can refer to the section “If you already have R and RStudio installed” in the <a href="https://carpentries-incubator.github.io/bioc-intro/#r-and-rstudio" class="external-link">Introduction to R</a> episode of the <a href="https://carpentries-incubator.github.io/bioc-intro" class="external-link">Introduction to data analysis with R and Bioconductor</a> lesson.</p>
-<p>Additionally, you will also need to install the following packages that will be used throughout the lesson.</p>
+      </section><section id="setup"><p>Ensure that you have the most recent versions of R and RStudio
+installed on your computer. For detailed instructions on how to do this,
+you can refer to the section “If you already have R and RStudio
+installed” in the <a href="https://carpentries-incubator.github.io/bioc-intro/#r-and-rstudio" class="external-link">Introduction
+to R</a> episode of the <a href="https://carpentries-incubator.github.io/bioc-intro" class="external-link">Introduction
+to data analysis with R and Bioconductor</a> lesson.</p>
+<p>Additionally, you will also need to install the following packages
+that will be used throughout the lesson.</p>
 <div class="codewrapper sourceCode" id="cb1">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">install.packages</span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span></span>
 <span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu">install</span><span class="op">(</span><span class="fu">c</span><span class="op">(</span><span class="st">"tidyverse"</span>, <span class="st">"SummarizedExperiment"</span>,</span>
-<span>                       <span class="st">"ExploreModelMatrix"</span>, <span class="st">"org.Mm.eg.db"</span>,</span>
+<span>                       <span class="st">"ExploreModelMatrix"</span>, <span class="st">"org.Hs.eg.db"</span>, <span class="st">"org.Mm.eg.db"</span>,</span>
 <span>                       <span class="st">"DESeq2"</span>, <span class="st">"vsn"</span>, <span class="st">"ComplexHeatmap"</span>,</span>
 <span>                       <span class="st">"RColorBrewer"</span>, <span class="st">"hexbin"</span>, <span class="st">"cowplot"</span>,</span>
-<span>                       <span class="st">"clusterProfiler"</span>, <span class="st">"enrichplot"</span>, <span class="st">"kableExtra"</span><span class="op">)</span><span class="op">)</span></span></code></pre>
+<span>                       <span class="st">"clusterProfiler"</span>, <span class="st">"enrichplot"</span>, <span class="st">"kableExtra"</span>,</span>
+<span>                       <span class="st">"msigdbr"</span>, <span class="st">"gplots"</span>, <span class="st">"ggplot2"</span>, <span class="st">"simplifyEnrichment"</span>,<span class="st">"apeglm"</span><span class="op">)</span><span class="op">)</span></span></code></pre>
 </div>
-<p><em>If you are attending a workshop, please complete all of the above before the workshop. Should you need help, an instructor will be available 30 minutes before the workshop commences to assist.</em></p>
+<p><em>If you are attending a workshop, please complete all of the above
+before the workshop. Should you need help, an instructor will be
+available 30 minutes before the workshop commences to assist.</em></p>
 
 
       </section></main><nav class="bottom-pagination mx-md-4" aria-label="Next Chapter"><!-- content for small screens --><div class="d-block d-sm-block d-md-none">
@@ -412,9 +464,9 @@ Finish
         <p>Materials licensed under <a href="../LICENSE.html">CC-BY 4.0</a> by the authors</p>
         
         <p><a href="https://creativecommons.org/licenses/by-sa/4.0/" class="external-link">Template licensed under CC-BY 4.0</a> by <a href="https://carpentries.org" class="external-link">The Carpentries</a></p>
-        <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/0.12.4" class="external-link">sandpaper (0.12.4)</a>,
-        <a href="https://github.com/carpentries/pegboard/tree/0.5.2" class="external-link">pegboard (0.5.2)</a>,
-      and <a href="https://github.com/carpentries/varnish/tree/0.2.14" class="external-link">varnish (0.2.14)</a>.</p>
+        <p>Built with <a href="https://github.com/carpentries/sandpaper" class="external-link">sandpaper (0.12.5)</a>,
+        <a href="https://github.com/carpentries/pegboard" class="external-link">pegboard (0.5.3)</a>,
+      and <a href="https://github.com/mblue9/varnish/tree/3403ad0dd37f7641c6442330fcc182937e7964c5" class="external-link">varnish (0.2.16)</a>.</p>
 			</div>
 		</footer></div> <!-- / div.container -->
 	<div id="to-top">
@@ -435,8 +487,8 @@ Finish
   "url": "https://carpentries-incubator.github.io/bioc-rnaseq/instructor/index.html",
   "identifier": "https://carpentries-incubator.github.io/bioc-rnaseq/instructor/index.html",
   "dateCreated": "2020-09-15",
-  "dateModified": "2023-07-19",
-  "datePublished": "2023-07-19"
+  "dateModified": "2023-07-25",
+  "datePublished": "2023-07-25"
 }
 
   </script><script>
