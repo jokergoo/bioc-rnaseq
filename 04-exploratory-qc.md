@@ -1,17 +1,13 @@
 ---
 source: Rmd
 title: Exploratory analysis and quality control
-teaching: XX
-exercises: XX
+teaching: 60
+exercises: 45
 editor_options:
   chunk_output_type: console
 ---
 
 
-```{.warning}
-Warning: replacing previous import 'S4Arrays::makeNindexFromArrayViewport' by
-'DelayedArray::makeNindexFromArrayViewport' when loading 'SummarizedExperiment'
-```
 
 ::::::::::::::::::::::::::::::::::::::: objectives
 
@@ -39,6 +35,12 @@ and QC steps taken before a formal statistical analysis is done.
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
+## Load libraries
+
+Assuming you just started RStudio again, load some packages we will use in this lesson along with the `SummarizedExperiment` object we created in the last lesson.
+
+
+
 ```r
 suppressPackageStartupMessages({
     library(SummarizedExperiment)
@@ -56,43 +58,88 @@ suppressPackageStartupMessages({
 se <- readRDS("data/GSE96870_se.rds")
 ```
 
+
+## Remove unexpressed genes
+
 Exploratory analysis is crucial for quality control and to get to know our data.
 It can help us detect quality problems, sample swaps and contamination, as well as give us a sense of the most salient patterns present in the data.
 In this episode, we will learn about two common ways of performing exploratory analysis for RNA-seq data; namely clustering and principal component analysis (PCA).
 These tools are in no way limited to (or developed for) analysis of RNA-seq data.
-However, there are certain characteristics of count assays that need to be taken into account when they are applied to this type of data.
+However, there are certain characteristics of count assays that need to be taken into account when they are applied to this type of data. First of all, not all mouse genes in the genome will be expressed in our Cerebellum samples. There are many different threshold you could use to say whether a gene's expression was detectable or not; here we are going to use a very minimal one that if a gene does not have more than 5 counts total across all samples, there is simply not enough data to be able to do anything with it anyway. 
 
 
 ```r
-se <- se[rowSums(assay(se, "counts")) > 5, ]
-dds <- DESeq2::DESeqDataSet(se[, se$tissue == "Cerebellum"],
-                            design = ~ sex + time)
+nrow(se)
 ```
 
-```{.warning}
-Warning in DESeq2::DESeqDataSet(se[, se$tissue == "Cerebellum"], design = ~sex
-+ : some variables in design formula are characters, converting to factors
+```{.output}
+[1] 41786
 ```
+
+```r
+# Remove genes/rows that do not have > 5 total counts 
+se <- se[rowSums(assay(se, "counts")) > 5, ]
+nrow(se)
+```
+
+```{.output}
+[1] 27430
+```
+
+
+:::::::::::::::::::::::::::::::::::::::  challenge
+
+## Challenge: What kind of genes survived this filtering?
+
+Last episode we discussed subsetting down to only mRNA genes. Here we subsetted based on a minimal expression level. How many of each type of gene survived the filtering?
+  
+::::::::::::::::::::::::::::::::::::::::::::::::::
+
+::::::::::::::::::::::::::::::::::: solution
+
+
+```r
+table(rowData(se)$gbkey)
+```
+
+```{.output}
+
+     C_region          exon     J_segment      misc_RNA          mRNA 
+           14          1765            14          1539         16859 
+        ncRNA precursor_RNA          rRNA          tRNA     V_segment 
+         6789           362             2            64            22 
+```
+
+:::::::::::::::::::::::::::::::::::
+
 
 ## Library size differences
 
+Differences in the total number of reads assigned to genes between samples typically occur for technical reasons. In practice, it means that we can not simply compare a gene's raw read count directly between samples and conclude that a sample with a higher read count also expresses the gene more strongly - the higher count may be caused by an overall higher number of reads in that sample.
+In the rest of this section, we will use the term *library size* to refer to the total number of reads assigned to genes for a sample. First we should compare the library sizes of all samples. 
+
 
 ```r
-ggplot(data.frame(sample = colnames(dds), 
-                  libSize = colSums(assay(dds, "counts"))),
-       aes(x = sample, y = libSize)) + 
-    geom_bar(stat = "identity") + theme_bw() + 
-    labs(x = "Sample", y = "Total count") + 
-    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+# Add in the sum of all counts
+
+se$libSize <-  colSums(assay(se))
+
+# Plot the libSize by using R's native pipe |>
+# to extract the colData, turn it into a regular
+# data frame then send to ggplot:
+
+colData(se) |>
+  as.data.frame() |>
+  ggplot(aes(x = Label, y = libSize / 1e6, fill = Group)) + 
+         geom_bar(stat = "identity") + theme_bw() + 
+         labs(x = "Sample", y = "Total count in millions") + 
+         theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
 ```
 
-<img src="fig/04-exploratory-qc-rendered-unnamed-chunk-5-1.png" style="display: block; margin: auto;" />
+<img src="fig/04-exploratory-qc-rendered-unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
 
-Differences in the total number of reads assigned to genes between samples typically occur for technical reasons.
-In practice, it means that we can not simply compare the raw read count directly between samples and conclude that a sample with a higher read count also expresses the gene more strongly - the higher count may be caused by an overall higher number of reads in that sample.
-In the rest of this section, we will use the term *library size* to refer to the total number of reads assigned to genes for a sample.
-We need to adjust for the differences in library size between samples, to avoid drawing incorrect conclusions.
-The way this is typically done for RNA-seq data can be described as a two-step procedure.
+
+We need to adjust for the differences in library size between samples, to avoid drawing incorrect conclusions. The way this is typically done for RNA-seq data can be described as a two-step procedure.
 First, we estimate *size factors* - sample-specific correction factors such that if the raw counts were to be divided by these factors, the resulting values would be more comparable across samples.
 Next, these size factors are incorporated into the statistical analysis of the data.
 It is important to pay close attention to how this is done in practice for a given analysis method.
@@ -102,19 +149,33 @@ Other times (as we will see for the differential expression analysis) it is impo
 With `DESeq2`, size factors are calculated using the `estimateSizeFactors()` function.
 The size factors estimated by this function combines an adjustment for differences in library sizes with an adjustment for differences in the RNA composition of the samples.
 The latter is important due to the compositional nature of RNA-seq data.
-There is a fixed number of reads to distribute between the genes, and if a single (or a few) very highly expressed gene consume a large part of the reads, all other genes will consequently receive very low counts.
+There is a fixed number of reads to distribute between the genes, and if a single (or a few) very highly expressed gene consume a large part of the reads, all other genes will consequently receive very low counts. We now switch our `SummarizedExperiment` object over to a `DESeqDataSet` as it has the internal structure to store these size factors. We also need to tell it our main experiment design, which is sex and time: 
 
 
 ```r
+dds <- DESeq2::DESeqDataSet(se, design = ~ sex + time)
+```
+
+```{.warning}
+Warning in DESeq2::DESeqDataSet(se, design = ~sex + time): some variables in
+design formula are characters, converting to factors
+```
+
+```r
 dds <- estimateSizeFactors(dds)
-ggplot(data.frame(libSize = colSums(assay(dds, "counts")),
-                  sizeFactor = sizeFactors(dds)),
-       aes(x = libSize, y = sizeFactor)) + 
+
+# Plot the size factors against library size
+# and look for any patterns by group:
+
+ggplot(data.frame(libSize = colSums(assay(dds)),
+                  sizeFactor = sizeFactors(dds),
+                  Group = dds$Group),
+       aes(x = libSize, y = sizeFactor, col = Group)) + 
     geom_point(size = 5) + theme_bw() + 
     labs(x = "Library size", y = "Size factor")
 ```
 
-<img src="fig/04-exploratory-qc-rendered-unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
+<img src="fig/04-exploratory-qc-rendered-unnamed-chunk-7-1.png" style="display: block; margin: auto;" />
 
 ## Transform data
 
@@ -128,10 +189,10 @@ In fact, the variance increases with the average read count.
 meanSdPlot(assay(dds), ranks = FALSE)
 ```
 
-<img src="fig/04-exploratory-qc-rendered-unnamed-chunk-7-1.png" style="display: block; margin: auto;" />
+<img src="fig/04-exploratory-qc-rendered-unnamed-chunk-8-1.png" style="display: block; margin: auto;" />
 
 There are two ways around this: either we develop methods specifically adapted to count data, or we adapt (transform) the count data so that the existing methods are applicable.
-Both ways have been explored; however, at the moment the second approach is arguably more widely applied in practice.
+Both ways have been explored; however, at the moment the second approach is arguably more widely applied in practice. We can transform our data using DESeq2's variance stablizing transformation and then verify that is had removed the correlation between average read count and variance.
 
 
 ```r
@@ -139,9 +200,11 @@ vsd <- DESeq2::vst(dds, blind = TRUE)
 meanSdPlot(assay(vsd), ranks = FALSE)
 ```
 
-<img src="fig/04-exploratory-qc-rendered-unnamed-chunk-8-1.png" style="display: block; margin: auto;" />
+<img src="fig/04-exploratory-qc-rendered-unnamed-chunk-9-1.png" style="display: block; margin: auto;" />
 
 ## Heatmaps and clustering
+
+There are many ways to cluster samples based on their similarity of expression patterns. One simple way is to calculate Euclidean distances between all pairs of samples (longer distance = more different) and then display the results with both a branching dendrogram and a heatmap to visualize the distances in color. From this, we infer that the Day 8 samples are more similar to each other than the rest of the samples, although Day 4 and Day 0 do not separate distinctly. Instead, males and females reliably separate.
 
 
 ```r
@@ -161,7 +224,7 @@ ComplexHeatmap::Heatmap(
 )
 ```
 
-<img src="fig/04-exploratory-qc-rendered-unnamed-chunk-9-1.png" style="display: block; margin: auto;" />
+<img src="fig/04-exploratory-qc-rendered-unnamed-chunk-10-1.png" style="display: block; margin: auto;" />
 
 ## PCA
 
@@ -188,7 +251,7 @@ ggplot(pcaData, aes(x = PC1, y = PC2)) +
     scale_color_manual(values = c(Male = "blue", Female = "red"))
 ```
 
-<img src="fig/04-exploratory-qc-rendered-unnamed-chunk-10-1.png" style="display: block; margin: auto;" />
+<img src="fig/04-exploratory-qc-rendered-unnamed-chunk-11-1.png" style="display: block; margin: auto;" />
 
 ## Session info
 
@@ -224,7 +287,7 @@ other attached packages:
  [3] ComplexHeatmap_2.16.0       ggplot2_3.4.2              
  [5] vsn_3.68.0                  DESeq2_1.40.2              
  [7] SummarizedExperiment_1.30.2 Biobase_2.60.0             
- [9] MatrixGenerics_1.12.2       matrixStats_1.0.0          
+ [9] MatrixGenerics_1.12.3       matrixStats_1.0.0          
 [11] GenomicRanges_1.52.0        GenomeInfoDb_1.36.1        
 [13] IRanges_2.34.1              S4Vectors_0.38.1           
 [15] BiocGenerics_0.46.0        
@@ -235,22 +298,22 @@ loaded via a namespace (and not attached):
  [7] lattice_0.21-8          vctrs_0.6.3             tools_4.3.1            
 [10] bitops_1.0-7            generics_0.1.3          parallel_4.3.1         
 [13] tibble_3.2.1            fansi_1.0.4             highr_0.10             
-[16] cluster_2.1.4           pkgconfig_2.0.3         Matrix_1.5-4.1         
+[16] cluster_2.1.4           pkgconfig_2.0.3         Matrix_1.6-0           
 [19] lifecycle_1.0.3         GenomeInfoDbData_1.2.10 farver_2.1.1           
 [22] compiler_4.3.1          munsell_0.5.0           codetools_0.2-19       
 [25] clue_0.3-64             RCurl_1.98-1.12         preprocessCore_1.62.1  
 [28] pillar_1.9.0            crayon_1.5.2            BiocParallel_1.34.2    
-[31] affy_1.78.2             DelayedArray_0.26.6     limma_3.56.2           
-[34] iterators_1.0.14        foreach_1.5.2           tidyselect_1.2.0       
-[37] locfit_1.5-9.8          digest_0.6.33           dplyr_1.1.2            
-[40] labeling_0.4.2          colorspace_2.1-0        cli_3.6.1              
-[43] magrittr_2.0.3          S4Arrays_1.0.4          utf8_1.2.3             
-[46] withr_2.5.0             scales_1.2.1            XVector_0.40.0         
-[49] affyio_1.70.0           GetoptLong_1.0.5        png_0.1-8              
-[52] evaluate_0.21           knitr_1.43              doParallel_1.0.17      
-[55] rlang_1.1.1             Rcpp_1.0.11             glue_1.6.2             
-[58] BiocManager_1.30.21.1   renv_1.0.0              R6_2.5.1               
-[61] zlibbioc_1.46.0        
+[31] affy_1.78.2             DelayedArray_0.26.7     limma_3.56.2           
+[34] iterators_1.0.14        abind_1.4-5             foreach_1.5.2          
+[37] tidyselect_1.2.0        locfit_1.5-9.8          digest_0.6.33          
+[40] dplyr_1.1.2             labeling_0.4.2          colorspace_2.1-0       
+[43] cli_3.6.1               magrittr_2.0.3          S4Arrays_1.0.5         
+[46] utf8_1.2.3              withr_2.5.0             scales_1.2.1           
+[49] XVector_0.40.0          affyio_1.70.0           GetoptLong_1.0.5       
+[52] png_0.1-8               evaluate_0.21           knitr_1.43             
+[55] doParallel_1.0.17       rlang_1.1.1             Rcpp_1.0.11            
+[58] glue_1.6.2              BiocManager_1.30.21.1   renv_1.0.0             
+[61] R6_2.5.1                zlibbioc_1.46.0        
 ```
 
 :::::::::::::::::::::::::::::::::::::::: keypoints

@@ -1,9 +1,12 @@
 ---
 source: Rmd
 title: Gene set enrichment analysis
-teaching: XX
-exercises: XX
+teaching: 60
+exercises: 45
 ---
+
+
+
 
 
 
@@ -90,17 +93,13 @@ between genders. The following code performs **DESeq2** analysis which you
 should have already learnt in the previous episode. In the end, we have a list
 of DE genes filtered by FDR < 0.05, and save it in the object `sexDEgenes`.
 
-The file `data/GSE96870_se.rds` contains a `RangedSummarizedExperiment` and it
-is downloaded and constructed in the script
+The file `data/GSE96870_se.rds` contains a `RangedSummarizedExperiment` contains RNA-Seq counts that were downloaded in [Episode 2](../episodes/02-setup.Rmd) and constructed in [Episode 3](../episodes/03-import-annotate.Rmd) (minimal codes for downloading and constructing in the script
 [`download_data.R`](https://github.com/carpentries-incubator/bioc-rnaseq/blob/main/episodes/download_data.R).
 In the following code, there are also comments that explain every step of the
 analysis.
 
 
 ```r
-# download example datasets and generate `GSE96870_se.rds`
-source("download_data.R")
-
 library(SummarizedExperiment)
 library(DESeq2)
 
@@ -111,8 +110,7 @@ se <- readRDS("data/GSE96870_se.rds")
 se <- se[rowData(se)$gbkey == "mRNA"]
 
 # construct a `DESeqDataSet` object where we also specify the experimental design
-dds <- DESeqDataSet(se[, se$tissue == "Cerebellum"],
-                            design = ~ sex + time)
+dds <- DESeqDataSet(se, design = ~ sex + time)
 # perform DESeq2 analysis
 dds <- DESeq(dds)
 # obtain DESeq2 results, here we only want Male vs Female in the "sex" variable
@@ -198,7 +196,7 @@ plot(venn(list("sexDEgenes"  = sexDEgenes,
 title(paste0("|universe| = ", length(totalGenes)))
 ```
 
-<img src="fig/06-gene-set-analysis-rendered-unnamed-chunk-7-1.png" style="display: block; margin: auto;" />
+<img src="fig/06-gene-set-analysis-rendered-unnamed-chunk-8-1.png" style="display: block; margin: auto;" />
 
 In the Venn diagram, we can observe that around 1.1% (13/1134) of genes in the
 _XY gene set_ are DE. Compared to the global fraction of DE genes (54/21198 =
@@ -382,7 +380,7 @@ genes are marked as non-DE genes (in blue). We grab $n_{+1}$ genes (the size
 of the gene set) from the box and we want to ask **what is the probability of
 having $n_{11}$ DE genes in our hand?**
 
-<img src="fig/06-gene-set-analysis-rendered-unnamed-chunk-14-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="fig/06-gene-set-analysis-rendered-unnamed-chunk-15-1.png" width="80%" style="display: block; margin: auto;" />
 
 We first calculate the total number of ways of picking $n_{+1}$ genes from
 total $n$ genes, without distinguishing whether they are DE or not:
@@ -503,9 +501,9 @@ microbenchmark(
 
 ```{.output}
 Unit: microseconds
-   expr   min    lq    mean median     uq    max neval
- fisher 456.1 484.0 565.136  526.3 579.50 1254.0   100
-  hyper   1.8   2.9   4.776    5.0   5.95   30.5   100
+   expr   min    lq    mean median     uq   max neval
+ fisher 385.6 396.5 442.509 458.55 471.55 679.0   100
+  hyper   2.1   3.0   4.451   4.00   5.50  22.2   100
 ```
 
 It is very astonishing that `phyper()` is hundreds of times faster than
@@ -1233,7 +1231,7 @@ resTimeGO = enrichGO(gene = timeDEgenes,
 ```
 
 ```{.output}
---> Expected input gene ID: 60534,21823,13870,58231,14238,22353
+--> Expected input gene ID: 54562,71233,24061,17685,56397,76421
 ```
 
 ```{.output}
@@ -1341,7 +1339,7 @@ object is highly unrecommended.]. This function design might not be proper
 because a function should return all the results no matter they are
 significant or not. Later users may need to use the complete enrichment table
 for downstream anlaysis. Second, the meaning of `pvalueCutoff` is not precise
-and there is redundancy between `pvalueCutoff` and `pvalueCutoff` (adjusted
+and there is redundancy between `pvalueCutoff` and `qvalueCutoff` (adjusted
 _p_-values and _q_-values are always non-smaller than raw _p_-values). Thus it
 is suggested to set both `pvalueCutoff` and `qvalueCutoff` to 1 in
 `enrichGO()`.
@@ -1746,7 +1744,7 @@ legend("topleft", legend = c("all protein-coding genes as universe", "all genes 
     pch = 16, col = c(2, 4))
 ```
 
-<img src="fig/06-gene-set-analysis-rendered-unnamed-chunk-47-1.png" style="display: block; margin: auto;" />
+<img src="fig/06-gene-set-analysis-rendered-unnamed-chunk-48-1.png" style="display: block; margin: auto;" />
 
 It is very straightforward to see, with a larger universe, there are more
 significant gene sets, which may produce potentially more false positives.
@@ -1824,13 +1822,13 @@ Note the two functions are directly applied on `resTimeGO` returned by `enrichGO
 barplot(resTimeGO, showCategory = 20)
 ```
 
-<img src="fig/06-gene-set-analysis-rendered-unnamed-chunk-49-1.png" style="display: block; margin: auto;" />
+<img src="fig/06-gene-set-analysis-rendered-unnamed-chunk-50-1.png" style="display: block; margin: auto;" />
 
 ```r
 dotplot(resTimeGO, showCategory = 20)
 ```
 
-<img src="fig/06-gene-set-analysis-rendered-unnamed-chunk-49-2.png" style="display: block; margin: auto;" />
+<img src="fig/06-gene-set-analysis-rendered-unnamed-chunk-50-2.png" style="display: block; margin: auto;" />
 
 Barplots can map two variables to the plot, one to the height of bars and the
 other to the colors of bars; while for dotplot, sizes of dots can be mapped to
@@ -1943,7 +1941,7 @@ ggplot(resTimeGOTable[1:10, ],
     ylab("")
 ```
 
-<img src="fig/06-gene-set-analysis-rendered-unnamed-chunk-54-1.png" style="display: block; margin: auto;" />
+<img src="fig/06-gene-set-analysis-rendered-unnamed-chunk-55-1.png" style="display: block; margin: auto;" />
 
 In the next example, we use _z_-score as the primary variable to map to the
 offset to origin, `DE_Ratio` and `Count` to map to dot colors and sizes.
@@ -1957,7 +1955,7 @@ ggplot(resTimeGOTable[1:10, ],
     ylab("")
 ```
 
-<img src="fig/06-gene-set-analysis-rendered-unnamed-chunk-55-1.png" style="display: block; margin: auto;" />
+<img src="fig/06-gene-set-analysis-rendered-unnamed-chunk-56-1.png" style="display: block; margin: auto;" />
 
 Both plots can highlight the gene set "leukocyte migration involved in
 inflammatory response" is relatively small but highly enriched.
@@ -1983,7 +1981,7 @@ ggplot(resTimeGOTable,
     geom_vline(xintercept = 1.5, lty = 2, col = "#444444")
 ```
 
-<img src="fig/06-gene-set-analysis-rendered-unnamed-chunk-56-1.png" style="display: block; margin: auto;" />
+<img src="fig/06-gene-set-analysis-rendered-unnamed-chunk-57-1.png" style="display: block; margin: auto;" />
 
 In the "volcano plot", we can observe the plot is composed by a list of
 curves. The trends are especially clear in the right bottom of the plot.
@@ -2060,7 +2058,7 @@ ggplot(rbind(resTimeGOupTable[1:5, ],
     ylab("")
 ```
 
-<img src="fig/06-gene-set-analysis-rendered-unnamed-chunk-58-1.png" style="display: block; margin: auto;" />
+<img src="fig/06-gene-set-analysis-rendered-unnamed-chunk-59-1.png" style="display: block; margin: auto;" />
 
 
 Specifically for GO enrichment, it is often that GO enrichment returns a long
