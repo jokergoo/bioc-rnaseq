@@ -567,14 +567,14 @@
     },
     "RcppNumerical": {
       "Package": "RcppNumerical",
-      "Version": "0.5-0",
+      "Version": "0.6-0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "Rcpp",
         "RcppEigen"
       ],
-      "Hash": "04d7d475a3be6fc39e2961227e74c477"
+      "Hash": "a008f094e60e88cef2472ef0e057f90e"
     },
     "S4Arrays": {
       "Package": "S4Arrays",
